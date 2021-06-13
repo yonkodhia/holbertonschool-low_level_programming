@@ -1,76 +1,87 @@
 #include "search_algos.h"
+
 /**
- * exponential_search - searches for a value in an array with
- * the exponential search algorithm
- * @array: array to search
- * @size: len of array
- * @value: value to search for
+ * print_array - prints the array of ints, separated with commas
  *
- * Return: index of value or -1
+ * @array: a pointer to the array to print
+ * @first: the first index to print
+ * @last: the last index to print
  */
-int exponential_search(int *array, size_t size, int value)
+
+void print_array(int *array, size_t first, size_t last)
 {
-	/* declarations */
-	size_t begin, end, x;
+	size_t i;
 
-	/* check for null array */
-	if (!array)
-		return (-1);
-
-	end = 1;
-	begin = 1;
-	while (end < size)
+	printf("Searching in array: ");
+	for (i = first; i <= last; i++)
 	{
-		if (value < array[end])
-			break;
-		printf("Value checked array[%d] = [%d]\n", (int) end, array[end]);
-		begin = end;
-		end = end * 2;
+		if (i != first)
+			printf(", ");
+		printf("%d", array[i]);
 	}
-	x = end < size - 1 ? end : size - 1;
-	printf("Value found between indexes [%d] and [%d]\n", (int) begin, (int) x);
-	return (re_binary(array, value, end / 2, x));
+	printf("\n");
 }
 
 /**
- * re_binary - recursive binary search
- * @array: array to search
- * @value: value to look for
- * @low: low side
- * @high: high side
- * Return: index of value or -1
+ * ex_binary_search - searches for a value in an array of integers
+ *
+ * @array: a pointer to the first element of the array to search in
+ * @size: the number of elements in array
+ * @value: the value to search for
+ * @start: the first index to look inside
+ *
+ * Return: the index where value is located or -1 on failure or not found
  */
-int re_binary(int *array, int value, size_t low, size_t high)
+
+int ex_binary_search(int *array, size_t size, int value, size_t start)
 {
-	size_t mid;
+	size_t i = 0, first = start, last = size - 1;
 
-	print_it(array, low, high);
-	if (high == low && array[low] != value)
-		return (-1);
+	if (array)
+	{
+		while (first <= last)
+		{
+			print_array(array, first, last);
+			i = (first + last) / 2; /* Gets the middle value */
 
-	mid = ((high - low) / 2) + low;
-	if (array[mid] == value)
-		return (mid);
-	if (array[mid] > value)
-		return (re_binary(array, value, low, mid - 1));
-	if (array[mid] < value)
-		return (re_binary(array, value, mid + 1, high));
+			if (value > array[i]) /* Uses the right part of array */
+				first = i + 1;
+			else if (value < array[i]) /* Uses the left part of array */
+				last = i - 1;
+			else
+				return (i);
+		}
+	}
+
 	return (-1);
 }
+
 /**
- * print_it - to print the array we are searching
- * @arr: ptr to first element the array
- * @begin: [0] element
- * @end: last element to print
+ * exponential_search - searches for a value in an array of integers
+ *
+ * @array: a pointer to the first element of the array to search in
+ * @size: the number of elements in array
+ * @value: the value to search for
+ *
+ * Return: the index where value is located or -1 on failure or not found
  */
-void print_it(int *arr, int begin, int end)
+
+int exponential_search(int *array, size_t size, int value)
 {
-	printf("Searching in array: ");
-	for (; begin <= end; begin++)
+	size_t i = 1;
+
+	if (array)
 	{
-		if (begin == end)
-			printf("%d\n", arr[begin]);
-		else
-			printf("%d, ", arr[begin]);
+		while (i < size && array[i] < value)
+		{
+			printf("Value checked array[%lu] = [%d]\n", i, array[i]);
+			i *= 2;
+		}
+
+		i = i > size - 1 ? size : i + 1;
+		printf("Value found between indexes [%lu] and [%lu]\n", i / 2, i - 1);
+		return (ex_binary_search(array, i, value, i / 2));
 	}
+
+	return (-1);
 }
